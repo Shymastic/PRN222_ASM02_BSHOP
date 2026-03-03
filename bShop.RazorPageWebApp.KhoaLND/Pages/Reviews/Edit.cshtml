@@ -1,0 +1,102 @@
+﻿
+@page
+@model bShop.RazorPageWebApp.KhoaLND.Pages.Reviews.EditModel
+
+@{
+    ViewData["Title"] = "Edit Review";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-warning text-dark">
+            <h4 class="mb-0">
+                <i class="bi bi-pencil-square me-2"></i> Edit Review
+            </h4>
+        </div>
+
+        <div class="card-body">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <input type="hidden" asp-for="Review.ReviewId" />
+                <div class="mb-3">
+                    <label class="form-label">Product</label>
+                    <input class="form-control"
+                           value="@Model.Review.Product?.ProductName"
+                           readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Buyer</label>
+                    <input class="form-control"
+                           value="@Model.Review.BuyerId"
+                           readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Order Detail</label>
+                    <input class="form-control"
+                           value="@Model.Review.OrderDetailId"
+                           readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Review.Rating" class="form-label">Rating (1–5)</label>
+                    <input asp-for="Review.Rating"
+                           type="number"
+                           min="1"
+                           max="5"
+                           class="form-control" />
+                    <span asp-validation-for="Review.Rating" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Review.Comment" class="form-label">Comment</label>
+                    <textarea asp-for="Review.Comment"
+                              rows="3"
+                              class="form-control"></textarea>
+                    <span asp-validation-for="Review.Comment" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a asp-page="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancel
+                    </a>
+
+                    <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    "use strict";
+
+     var connection = new signalR.HubConnectionBuilder().withUrl("/reviewHub").build();
+        connection.start().catch(function (err) {
+            return console.error(err.toString());
+        });
+        var data = {
+            reviewId: "@Model.Review.ReviewId",
+            productId: "@Model.Review.ProductId",
+            buyerId: "@Model.Review.BuyerId",
+            orderDetailId: "@Model.Review.OrderDetailId",
+            rating: "@Model.Review.Rating",
+            comment: "@Model.Review.Comment"
+        };
+        const jsonString = JSON.stringify(data);
+        //send connection to reviewHub
+        connection.invoke("ReceiveUpdate", jsonString).catch(function (err) {
+            return console.error(err.toString());
+        });
+
+
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

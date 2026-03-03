@@ -1,0 +1,109 @@
+﻿@page
+@model bShop.RazorPageWebApp.KhoaLND.Pages.Reviews.CreateModel
+
+@{
+    ViewData["Title"] = "Create Review";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">
+                <i class="bi bi-plus-circle me-2"></i> Create Review
+            </h4>
+        </div>
+
+        <div class="card-body">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Review.ProductId" class="form-label">Product</label>
+                    <select asp-for="Review.ProductId"
+                            class="form-select"
+                            asp-items="ViewBag.ProductId">
+                        <option value="">-- Select product --</option>
+                    </select>
+                    <span asp-validation-for="Review.ProductId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Review.BuyerId" class="form-label">Buyer</label>
+                    <select asp-for="Review.BuyerId"
+                            class="form-select"
+                            asp-items="ViewBag.BuyerId">
+                        <option value="">-- Select buyer --</option>
+                    </select>
+                    <span asp-validation-for="Review.BuyerId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Review.OrderDetailId" class="form-label">Order Detail</label>
+                    <select asp-for="Review.OrderDetailId"
+                            class="form-select"
+                            asp-items="ViewBag.OrderDetailId">
+                        <option value="">-- Select order detail --</option>
+                    </select>
+                    <span asp-validation-for="Review.OrderDetailId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Review.Rating" class="form-label">Rating (1–5)</label>
+                    <input asp-for="Review.Rating"
+                           type="number"
+                           min="1"
+                           max="5"
+                           class="form-control" />
+                    <span asp-validation-for="Review.Rating" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Review.Comment" class="form-label">Comment</label>
+                    <textarea asp-for="Review.Comment"
+                              rows="3"
+                              class="form-control"
+                              placeholder="Optional feedback..."></textarea>
+                    <span asp-validation-for="Review.Comment" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a asp-page="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
+
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Create Review
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    "use strict";
+     var connection = new signalR.HubConnectionBuilder().withUrl("/reviewHub").build();
+        connection.start().catch(function (err) {
+            return console.error(err.toString());
+            });
+            //input create form into json string for ReceiveCreate
+            document.querySelector("form").addEventListener("submit", function (event) {
+                event.preventDefault();
+                var formData = new FormData(this);
+                var reviewData = {};
+                formData.forEach(function (value, key) {
+                    reviewData[key] = value;
+                });
+                connection.invoke("ReceiveCreate", JSON.stringify(reviewData)).catch(function (err) {
+                    return console.error(err.toString());
+                });
+                this.submit();
+            });
+            
+
+            
+            </script>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
